@@ -4,6 +4,8 @@ import com.ecommerce.ecomApp.entity.User;
 import com.ecommerce.ecomApp.handlers.LoginRequest;
 import com.ecommerce.ecomApp.jwt.JwtUtils;
 import com.ecommerce.ecomApp.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -49,6 +51,26 @@ public class AuthController {
         }
         UserDetails userDetails = userService.loadUserByUsername(request.getUsername());
         String jwt = jwtUtils.generateToken(userDetails);
-        return ResponseEntity.ok(Map.of("Token",jwt));
+        //adding the jwt in the cookie
+        Cookie jwtCookie = new Cookie("jwt", jwt);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(10 * 60);
+
+        response.addCookie(jwtCookie);
+
+        return ResponseEntity.ok(Map.of("Token", jwt));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0);
+        response.addCookie(jwtCookie);
+        return ResponseEntity.ok("Logged out successfully");
     }
 }
