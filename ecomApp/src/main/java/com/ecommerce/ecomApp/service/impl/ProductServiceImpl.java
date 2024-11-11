@@ -43,6 +43,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto saveProduct(ProductDto productDto) {
         if (productDto != null) {
+            if(productRepository.findByName(productDto.getName().trim()).isPresent()) {
+                throw new RuntimeException("Product with name " + productDto.getName().trim() + " already exists");
+            }
             Product product = new Product();
             product.setName(productDto.getName());
             product.setPrice(productDto.getPrice());

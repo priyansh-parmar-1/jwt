@@ -4,6 +4,7 @@ import com.ecommerce.ecomApp.entity.Role;
 import com.ecommerce.ecomApp.entity.User;
 import com.ecommerce.ecomApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,8 +28,12 @@ public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
+
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new DuplicateKeyException("Username is already in use");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRoles().isEmpty()){
+        if (user.getRoles().isEmpty()) {
             user.setRoles(Set.of(Role.USER));
         }
         return userRepository.save(user);
