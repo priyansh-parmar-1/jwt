@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/order")
 @Slf4j
@@ -38,21 +40,19 @@ public class OrderController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping
-    public ResponseEntity<?> updateOrderStatus(@RequestParam("id") String id, @RequestParam("status") String status) {
-        try {
-            return ResponseEntity.ok(orderService.updateOrder(id, status));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+    public Response<Order> updateOrderStatus(@RequestParam("id") String id, @RequestParam("status") String status) {
+        log.info("IN ORDER-CONTROLLER :: updateOrderStatus");
+        Response<Order> response = orderService.updateOrder(id, status);
+        log.info("OUT ORDER-CONTROLLER :: updateOrderStatus");
+        return response;
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<?> getAllOrdersByUserId(HttpServletRequest request) {
-        try {
-            return ResponseEntity.ok(orderService.findOrdersByUserId(request));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+    public Response<List<Order>> getAllOrdersByUserId(HttpServletRequest request) {
+        log.info("IN ORDER-CONTROLLER :: getAllOrdersByUserId");
+        Response<List<Order>> response = orderService.findOrdersByUserId(request);
+        log.info("OUT ORDER-CONTROLLER :: getAllOrdersByUserId");
+        return response;
     }
 
 }

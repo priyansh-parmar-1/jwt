@@ -6,6 +6,7 @@ import com.ecommerce.ecomApp.entity.User;
 import com.ecommerce.ecomApp.repository.UserRepository;
 import com.ecommerce.ecomApp.response.Response;
 import com.ecommerce.ecomApp.response.ResponseConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService implements UserDetailsService {
 
     @Autowired
@@ -80,13 +82,16 @@ public class UserService implements UserDetailsService {
     }
 
     public Response<List<User>> getAllUsers() {
+        log.info("IN USER SERVICE :: getAllUsers");
         List<User> users = userRepository.findAll();
         if (!users.isEmpty()) {
+            log.info("IN USER SERVICE :: getAllUsers :: {}", users);
             return Response.<List<User>>builder()
                     .status(ResponseConstants.SUCCESS)
                     .data(users)
                     .build();
         } else {
+            log.error("IN USER SERVICE :: getAllUsers :: No users found");
             return Response.<List<User>>builder()
                     .status(ResponseConstants.ERROR)
                     .error("No users found")
