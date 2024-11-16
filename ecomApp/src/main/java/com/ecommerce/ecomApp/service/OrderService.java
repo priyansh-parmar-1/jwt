@@ -1,15 +1,18 @@
 package com.ecommerce.ecomApp.service;
 
 import com.ecommerce.ecomApp.entity.Order;
+import com.ecommerce.ecomApp.response.Response;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
 public interface OrderService {
 
-    Order createOrder(Order order,HttpServletRequest request);
+    Response<Order> createOrder(Order order, HttpServletRequest request);
 
-    List<Order> findAllOrders();
+    Response<List<Order>> findAllOrders();
 
-    List<Order> findOrdersByUserId(HttpServletRequest request);
+    Response<List<Order>> findOrdersByUserId(HttpServletRequest request);
+
+    Response<Order> updateOrder(String id, String status);
 }

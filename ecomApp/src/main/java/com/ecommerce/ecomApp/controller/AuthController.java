@@ -1,8 +1,10 @@
 package com.ecommerce.ecomApp.controller;
 
+import com.ecommerce.ecomApp.dto.UserDto;
 import com.ecommerce.ecomApp.entity.User;
 import com.ecommerce.ecomApp.handlers.LoginRequest;
 import com.ecommerce.ecomApp.jwt.JwtUtils;
+import com.ecommerce.ecomApp.response.Response;
 import com.ecommerce.ecomApp.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,12 +40,8 @@ public class AuthController {
     private int cookieExpiration;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        try {
-            return ResponseEntity.ok(userService.registerUser(user));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+    public Response<UserDto> registerUser(@RequestBody User user) {
+        return userService.registerUser(user);
     }
 
     @PostMapping("/login")
