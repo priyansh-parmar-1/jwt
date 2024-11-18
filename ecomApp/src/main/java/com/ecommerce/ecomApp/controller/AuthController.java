@@ -1,12 +1,15 @@
 package com.ecommerce.ecomApp.controller;
 
+import com.ecommerce.ecomApp.dto.UserDto;
 import com.ecommerce.ecomApp.entity.User;
 import com.ecommerce.ecomApp.handlers.LoginRequest;
 import com.ecommerce.ecomApp.jwt.JwtUtils;
+import com.ecommerce.ecomApp.response.Response;
 import com.ecommerce.ecomApp.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,9 +36,12 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Value("${jwt.cookie.expiration}")
+    private int cookieExpiration;
+
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.registerUser(user));
+    public Response<UserDto> registerUser(@RequestBody User user) {
+        return userService.registerUser(user);
     }
 
     @PostMapping("/login")
@@ -56,7 +62,7 @@ public class AuthController {
         jwtCookie.setHttpOnly(true);
         jwtCookie.setSecure(true);
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(10 * 60);
+        jwtCookie.setMaxAge(cookieExpiration);
 
         response.addCookie(jwtCookie);
 

@@ -18,6 +18,9 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String SECRET;
 
+    @Value("${jwt.expiration}")
+    private long jwtExp;
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -32,7 +35,7 @@ public class JwtUtils {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExp))
                 .signWith(SignatureAlgorithm.HS256, SECRET)
                 .compact();
     }

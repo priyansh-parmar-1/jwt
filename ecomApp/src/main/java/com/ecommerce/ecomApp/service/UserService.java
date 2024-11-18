@@ -1,8 +1,12 @@
 package com.ecommerce.ecomApp.service;
 
+import com.ecommerce.ecomApp.dto.UserDto;
 import com.ecommerce.ecomApp.entity.Role;
 import com.ecommerce.ecomApp.entity.User;
 import com.ecommerce.ecomApp.repository.UserRepository;
+import com.ecommerce.ecomApp.response.Response;
+import com.ecommerce.ecomApp.response.ResponseConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService implements UserDetailsService {
 
     @Autowired
@@ -26,12 +31,35 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public User registerUser(User user) {
+    public Response<UserDto> registerUser(User user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return Response.<UserDto>builder()
+                    .status(ResponseConstants.ERROR)
+                    .error("Username is already in use")
+                    .build();
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRoles().isEmpty()){
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(Set.of(Role.USER));
         }
-        return userRepository.save(user);
+        try {
+            userRepository.save(user);
+            UserDto userDto = new UserDto(user);
+            return Response.<UserDto>builder()
+                    .status(ResponseConstants.SUCCESS)
+                    .data(userDto)
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return Response.<UserDto>builder()
+                    .status(ResponseConstants.ERROR)
+                    .error(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return Response.<UserDto>builder()
+                    .status(ResponseConstants.ERROR)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -53,12 +81,21 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public List<User> getAllUsers() {
+    public Response<List<User>> getAllUsers() {
+        log.info("IN USER SERVICE :: getAllUsers");
         List<User> users = userRepository.findAll();
         if (!users.isEmpty()) {
-            return users;
+            log.info("IN USER SERVICE :: getAllUsers :: {}", users);
+            return Response.<List<User>>builder()
+                    .status(ResponseConstants.SUCCESS)
+                    .data(users)
+                    .build();
         } else {
-            throw new RuntimeException("No users found");
+            log.error("IN USER SERVICE :: getAllUsers :: No users found");
+            return Response.<List<User>>builder()
+                    .status(ResponseConstants.ERROR)
+                    .error("No users found")
+                    .build();
         }
     }
 

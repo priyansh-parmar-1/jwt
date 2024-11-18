@@ -1,16 +1,19 @@
 package com.ecommerce.ecomApp.service;
 
 import com.ecommerce.ecomApp.dto.ProductDto;
+import com.ecommerce.ecomApp.response.Response;
 
 import java.util.List;
 
 public interface ProductService {
 
-    List<ProductDto> findAllProducts();
+    Response<List<ProductDto>> findAllProducts();
 
-    ProductDto findProductById(Long id);
+    Response<ProductDto> findProductById(Long id);
 
-    ProductDto saveProduct(ProductDto productDto);
+    Response<ProductDto> saveProduct(ProductDto productDto);
 
-    List<ProductDto> saveManyProducts(List<ProductDto> productDtos);
+    Response<List<ProductDto>> saveManyProducts(List<ProductDto> productDtos);
+
+    Response<ProductDto> deleteProduct(String id);
 }
