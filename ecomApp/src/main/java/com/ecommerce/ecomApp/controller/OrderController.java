@@ -30,12 +30,11 @@ public class OrderController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
-    public ResponseEntity<?> getAllOrders() {
-        try {
-            return ResponseEntity.ok(orderService.findAllOrders());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+    public Response<List<Order>> getAllOrders() {
+        log.info("IN ORDER-CONTROLLER :: getAllOrders");
+        Response<List<Order>> response = orderService.findAllOrders();
+        log.info("OUT ORDER-CONTROLLER :: getAllOrders");
+        return response;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -54,5 +53,4 @@ public class OrderController {
         log.info("OUT ORDER-CONTROLLER :: getAllOrdersByUserId");
         return response;
     }
-
 }
